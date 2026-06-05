@@ -1,36 +1,114 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Phassaree's Tennis Archive
 
-## Getting Started
+A scrapbook-aesthetic tennis portfolio built with Next.js, Neon DB, and Drizzle ORM — everything runs free.
 
-First, run the development server:
+## Tech Stack
+
+- **Next.js 16** (App Router, TypeScript)
+- **Neon DB** — free serverless PostgreSQL
+- **Drizzle ORM** — type-safe SQL
+- **Tailwind CSS v4** — scrapbook colour theme + utility classes
+- **Tesseract.js** — OCR to auto-fill forms from certificate images
+- **Google Fonts** — Playfair Display, Dancing Script, Lato
+
+---
+
+## Quick Setup
+
+### 1. Install dependencies
+
+```bash
+npm install
+```
+
+### 2. Get a free Neon DB URL
+
+1. Sign up at [neon.tech](https://neon.tech) (free, no credit card)
+2. Create a project, copy the **Connection string**
+
+### 3. Configure environment
+
+```bash
+cp .env.local.example .env.local
+```
+
+Paste your connection string into `.env.local`:
+
+```
+DATABASE_URL=postgres://user:password@ep-xxx.us-east-2.aws.neon.tech/neondb?sslmode=require
+```
+
+### 4. Push the schema to Neon
+
+```bash
+npm run db:push
+```
+
+### 5. Start the dev server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Visit [http://localhost:3000](http://localhost:3000). The homepage loads immediately even with an empty database.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Adding Achievements
 
-## Learn More
+Go to [http://localhost:3000/admin](http://localhost:3000/admin):
 
-To learn more about Next.js, take a look at the following resources:
+1. **(Optional)** Upload a certificate image — Tesseract.js OCR auto-extracts tournament name, date, award, and category
+2. Edit the pre-filled form fields as needed
+3. Add photos via drag-and-drop
+4. Click **Save Achievement** — entry appears on the homepage immediately
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Scripts
 
-## Deploy on Vercel
+| Script | Description |
+|--------|-------------|
+| `npm run dev` | Start development server |
+| `npm run build` | Production build |
+| `npm run start` | Start production server |
+| `npm run db:push` | Push schema changes to Neon |
+| `npm run db:studio` | Open Drizzle Studio (visual DB GUI) |
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Free Deployment on Vercel
+
+1. Push your repo to GitHub
+2. Import at [vercel.com](https://vercel.com) → **New Project**
+3. Add `DATABASE_URL` in **Settings → Environment Variables**
+4. Deploy
+
+> **Image uploads on Vercel:** Vercel's filesystem is ephemeral; uploaded photos won't persist across deployments. For production, swap the upload route with [Vercel Blob](https://vercel.com/docs/storage/vercel-blob) (free tier) or any S3-compatible service.
+
+---
+
+## Project Structure
+
+```
+app/
+├── globals.css           Tailwind v4 @theme + scrapbook utilities
+├── layout.tsx            Root layout, Google Fonts
+├── page.tsx              Homepage (server component)
+├── admin/page.tsx        Admin dashboard (client component)
+└── api/
+    ├── achievements/     GET all / POST new
+    ├── upload/           POST image → /public/uploads/
+    └── ocr/              POST image → Tesseract OCR
+
+components/
+├── Navbar.tsx
+├── HeroSection.tsx       Notebook-paper hero with stats
+├── LatestCarousel.tsx    Paginated polaroid carousel (client)
+├── AgeGroupSection.tsx   Per age-group card grid
+├── AchievementCard.tsx   Polaroid + standard card variants
+└── Footer.tsx
+
+lib/
+└── db.ts                 Neon driver, Drizzle schema, getDb()
+```
