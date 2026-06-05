@@ -1,0 +1,199 @@
+@import "tailwindcss";
+
+/* ─── Custom theme tokens ─────────────────────────────────── */
+@theme {
+  --color-sage:       #4a7c4a;
+  --color-sage-dark:  #3a6a3a;
+  --color-sage-light: #6a9c6a;
+  --color-mint:       #a8d5ba;
+  --color-mint-light: #d4edd8;
+  --color-cream:      #faf8f3;
+  --color-beige:      #f5f0e8;
+  --color-parchment:  #ede8d0;
+  --color-brown:      #8b7355;
+  --color-tape:       rgba(247, 233, 142, 0.78);
+
+  --animate-fade-up:  fade-up 0.65s ease-out both;
+  --animate-fade-in:  fade-in 0.45s ease-out both;
+}
+
+/* Fonts referencing next/font CSS vars (set on <html>) */
+@theme inline {
+  --font-playfair: var(--next-playfair), "Playfair Display", Georgia, serif;
+  --font-dancing:  var(--next-dancing),  "Dancing Script", cursive;
+  --font-lato:     var(--next-lato),     "Lato", Helvetica, Arial, sans-serif;
+}
+
+/* ─── Keyframes ───────────────────────────────────────────── */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ─── Base ────────────────────────────────────────────────── */
+:root {
+  --foreground: #2c2c2c;
+}
+
+body {
+  background-color: var(--color-cream);
+  color: var(--foreground);
+  font-family: var(--font-lato), Helvetica, Arial, sans-serif;
+}
+
+/* ─── Scrapbook utility classes ───────────────────────────── */
+@layer utilities {
+  /* Polaroid card */
+  .polaroid {
+    background: #fff;
+    padding: 12px 12px 52px;
+    box-shadow: 2px 5px 14px rgba(0, 0, 0, 0.13), 0 1px 3px rgba(0, 0, 0, 0.08);
+    position: relative;
+  }
+
+  .polaroid-tilt-l {
+    transform: rotate(-2.8deg);
+    transition: transform 0.28s ease, box-shadow 0.28s ease;
+  }
+  .polaroid-tilt-l:hover {
+    transform: rotate(0deg) scale(1.04);
+    box-shadow: 4px 10px 24px rgba(0, 0, 0, 0.18);
+  }
+
+  .polaroid-tilt-r {
+    transform: rotate(2.2deg);
+    transition: transform 0.28s ease, box-shadow 0.28s ease;
+  }
+  .polaroid-tilt-r:hover {
+    transform: rotate(0deg) scale(1.04);
+    box-shadow: 4px 10px 24px rgba(0, 0, 0, 0.18);
+  }
+
+  .polaroid-tilt-n {
+    transform: rotate(-0.6deg);
+    transition: transform 0.28s ease, box-shadow 0.28s ease;
+  }
+  .polaroid-tilt-n:hover {
+    transform: rotate(0deg) scale(1.04);
+    box-shadow: 4px 10px 24px rgba(0, 0, 0, 0.18);
+  }
+
+  /* Washi tape strip */
+  .tape {
+    position: absolute;
+    top: -11px;
+    left: 50%;
+    transform: translateX(-50%) rotate(-3deg);
+    width: 64px;
+    height: 22px;
+    background: rgba(247, 233, 142, 0.82);
+    border: 1px solid rgba(200, 175, 60, 0.35);
+    z-index: 10;
+    pointer-events: none;
+  }
+
+  .tape-pink {
+    background: rgba(249, 190, 215, 0.82);
+    border-color: rgba(210, 140, 170, 0.35);
+    transform: translateX(-50%) rotate(2deg);
+  }
+
+  .tape-green {
+    background: rgba(168, 213, 186, 0.82);
+    border-color: rgba(100, 170, 130, 0.35);
+    transform: translateX(-50%) rotate(-1.5deg);
+  }
+
+  /* Award badge */
+  .award-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 10px;
+    border-radius: 9999px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    line-height: 1.5;
+  }
+
+  .badge-gold {
+    background: #fef3c7;
+    color: #92400e;
+    border: 1px solid #fcd34d;
+  }
+
+  .badge-silver {
+    background: #f3f4f6;
+    color: #374151;
+    border: 1px solid #d1d5db;
+  }
+
+  .badge-sage {
+    background: transparent;
+    color: #4a7c4a;
+    border: 1.5px dashed #4a7c4a;
+  }
+
+  /* Fade-up animation helper */
+  .fade-up {
+    opacity: 0;
+    animation: fade-up 0.65s ease-out both;
+  }
+  .fade-up-1 { animation-delay: 0.1s; }
+  .fade-up-2 { animation-delay: 0.2s; }
+  .fade-up-3 { animation-delay: 0.3s; }
+  .fade-up-4 { animation-delay: 0.4s; }
+  .fade-up-5 { animation-delay: 0.5s; }
+
+  /* Notebook paper background */
+  .notebook-bg {
+    background-color: #faf8f3;
+    background-image:
+      linear-gradient(#ddd8c8 1px, transparent 1px),
+      linear-gradient(90deg, #e8a8a8 1.5px, transparent 1px);
+    background-size: 100% 32px, 44px 100%;
+    background-position: 0 6px, 44px 0;
+  }
+
+  /* Torn paper bottom edge (clip-path zigzag) */
+  .torn-bottom {
+    clip-path: polygon(
+      0 0, 100% 0, 100% 88%,
+      98% 100%, 95% 82%, 92% 100%, 89% 78%, 86% 98%,
+      83% 80%, 80% 100%, 77% 84%, 74% 100%, 71% 76%,
+      68% 96%, 65% 82%, 62% 100%, 59% 78%, 56% 96%,
+      53% 80%, 50% 100%, 47% 82%, 44% 98%, 41% 76%,
+      38% 100%, 35% 84%, 32% 96%, 29% 78%, 26% 100%,
+      23% 82%, 20% 96%, 17% 80%, 14% 100%, 11% 76%,
+      8% 96%, 5% 82%, 2% 100%, 0 84%
+    );
+    padding-bottom: 2rem;
+  }
+
+  /* Dashed decorative border */
+  .dashed-frame {
+    border: 2px dashed #a8d5ba;
+    border-radius: 6px;
+  }
+
+  /* Age-group pill header that bleeds left */
+  .pill-header {
+    display: inline-block;
+    padding: 6px 28px 6px 0;
+    border-radius: 0 9999px 9999px 0;
+    font-family: var(--font-dancing);
+    font-size: 1.5rem;
+    line-height: 1.3;
+  }
+
+  /* Subtle paper texture overlay */
+  .paper-texture {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  }
+}
