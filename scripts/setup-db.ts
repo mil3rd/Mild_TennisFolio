@@ -28,6 +28,16 @@ try {
     )
   `;
   console.log("✅  Table 'achievements' is ready.");
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS images (
+      id           TEXT PRIMARY KEY,
+      content_type VARCHAR(100) NOT NULL,
+      data         TEXT         NOT NULL,
+      created_at   TIMESTAMP DEFAULT NOW()
+    )
+  `;
+  console.log("✅  Table 'images' is ready.");
 } catch (err) {
   console.error("❌  Failed:", err instanceof Error ? err.message : err);
   process.exit(1);

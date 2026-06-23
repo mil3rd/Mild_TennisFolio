@@ -1,7 +1,5 @@
-import { writeFile, mkdir } from "fs/promises";
-import { existsSync } from "fs";
-import path from "path";
 import { v4 as uuidv4 } from "uuid";
+import { getDb, images } from "@/lib/db";
 
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 const MAX_SIZE_MB = 10;
@@ -29,18 +27,14 @@ export async function POST(request: Request) {
       );
     }
 
-    const ext = file.name.split(".").pop()?.toLowerCase() ?? "jpg";
-    const filename = `${uuidv4()}.${ext}`;
-
-    const uploadsDir = path.join(process.cwd(), "public", "uploads");
-    if (!existsSync(uploadsDir)) {
-      await mkdir(uploadsDir, { recursive: true });
-    }
-
+    const id = uuidv4();
     const bytes = await file.arrayBuffer();
-    await writeFile(path.join(uploadsDir, filename), Buffer.from(bytes));
+    const data = Buffer.from(bytes).toString("base64");
 
-    return Response.json({ url: `/uploads/${filename}` }, { status: 201 });
+    const db = getDb();
+    await db.insert(images).values({ id, content_type: file.type, data });
+
+    return Response.json({ url: `/api/images/${id}` }, { status: 201 });
   } catch (err) {
     console.error("POST /api/upload error:", err);
     return Response.json({ error: "Upload failed" }, { status: 500 });
