@@ -41,6 +41,15 @@ function badgeClass(award: string) {
   return "badge-sage";
 }
 
+/** Map free-form OCR text to one of the fixed result options (or "" if none). */
+function normalizeAward(raw: string): string {
+  const a = raw.toLowerCase();
+  if (/1st|first|gold|champion|winner/.test(a)) return "First Place";
+  if (/2nd|second|silver|runner/.test(a)) return "Second Place";
+  if (/3rd|third|bronze/.test(a)) return "Third Place";
+  return "";
+}
+
 function formatDate(d: string) {
   try {
     const [y, m, day] = d.split("-").map(Number);
@@ -138,7 +147,7 @@ export default function AdminPage() {
       setForm((prev) => ({
         ...prev,
         title: ex.title ?? prev.title,
-        award: ex.award ?? prev.award,
+        award: ex.award ? normalizeAward(ex.award) || prev.award : prev.award,
         event_date: ex.eventDate ?? prev.event_date,
         category: ex.category ?? prev.category,
       }));
@@ -201,7 +210,7 @@ export default function AdminPage() {
       age_group: a.age_group,
       category: a.category ?? "",
       event_date: a.event_date,
-      award: a.award,
+      award: normalizeAward(a.award) || a.award,
       description: a.description ?? "",
     });
     photoUrls.forEach((u) => URL.revokeObjectURL(u));
@@ -482,24 +491,27 @@ export default function AdminPage() {
             {/* Award */}
             <Field label="Award / Result" required>
               <div className="relative">
-                <input
+                <select
                   name="award"
                   value={form.award}
                   onChange={handleChange}
-                  placeholder='e.g. "1st Place" or "Runner-up"'
                   required
-                  className="input-base pr-24"
-                />
+                  className="input-base bg-white pr-24"
+                >
+                  <option value="">Select result…</option>
+                  <option value="First Place">First Place</option>
+                  <option value="Second Place">Second Place</option>
+                  <option value="Third Place">Third Place</option>
+                </select>
                 {form.award && (
                   <span
-                    className={`award-badge ${badgeClass(form.award)} absolute right-3 top-1/2 -translate-y-1/2`}
+                    className={`award-badge ${badgeClass(form.award)} absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none`}
                   >
                     {badgeClass(form.award) === "badge-gold"
                       ? "🥇"
                       : badgeClass(form.award) === "badge-silver"
                         ? "🥈"
-                        : "🎾"}{" "}
-                    Preview
+                        : "🥉"}
                   </span>
                 )}
               </div>

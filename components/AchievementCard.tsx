@@ -1,4 +1,5 @@
 import type { Achievement } from "@/lib/db";
+import ZoomableImage from "./ZoomableImage";
 
 type Variant = "polaroid" | "card";
 
@@ -53,8 +54,7 @@ export default function AchievementCard({
         {/* Photo area */}
         <div className="w-full aspect-[4/3] bg-mint-light overflow-hidden mb-3">
           {mainImage ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+            <ZoomableImage
               src={mainImage}
               alt={title}
               className="w-full h-full object-cover"
@@ -91,8 +91,7 @@ export default function AchievementCard({
       {/* Image */}
       <div className="aspect-video bg-mint-light overflow-hidden relative">
         {mainImage ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          <ZoomableImage
             src={mainImage}
             alt={title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
