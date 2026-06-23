@@ -1,5 +1,7 @@
 /* OCR route — runs Tesseract.js server-side (Node.js) */
 
+import { isAdminRequest } from "@/lib/auth";
+
 function extractDate(text: string): string | undefined {
   // DD/MM/YYYY or DD-MM-YYYY
   const slash = text.match(/\b(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})\b/);
@@ -76,6 +78,10 @@ function extractCategory(lines: string[]): string | undefined {
 
 export async function POST(request: Request) {
   try {
+    if (!(await isAdminRequest())) {
+      return Response.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const formData = await request.formData();
     const imageFile = formData.get("image") as File | null;
 

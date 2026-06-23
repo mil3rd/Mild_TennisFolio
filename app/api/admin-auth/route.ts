@@ -1,16 +1,7 @@
-import crypto from "crypto";
 import { cookies } from "next/headers";
+import { COOKIE, hashPassword } from "@/lib/auth";
 
-const COOKIE = "admin_token";
-const SALT = "phassaree_admin_v1";
 const SEVEN_DAYS = 60 * 60 * 24 * 7;
-
-function hashPassword(password: string): string {
-  return crypto
-    .createHash("sha256")
-    .update(password + SALT)
-    .digest("hex");
-}
 
 /* POST /api/admin-auth — verify password and set session cookie */
 export async function POST(request: Request) {

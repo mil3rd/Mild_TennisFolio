@@ -1,5 +1,6 @@
 import { desc } from "drizzle-orm";
 import { getDb, achievements, type NewAchievement } from "@/lib/db";
+import { isAdminRequest } from "@/lib/auth";
 
 export async function GET() {
   try {
@@ -17,6 +18,10 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    if (!(await isAdminRequest())) {
+      return Response.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const body = await request.json();
     const { title, age_group, category, event_date, award, description, images } =
       body as NewAchievement;

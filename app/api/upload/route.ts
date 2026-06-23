@@ -1,11 +1,16 @@
 import { v4 as uuidv4 } from "uuid";
 import { getDb, images } from "@/lib/db";
+import { isAdminRequest } from "@/lib/auth";
 
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 const MAX_SIZE_MB = 10;
 
 export async function POST(request: Request) {
   try {
+    if (!(await isAdminRequest())) {
+      return Response.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const formData = await request.formData();
     const file = formData.get("file") as File | null;
 
