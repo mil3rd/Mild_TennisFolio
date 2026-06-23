@@ -2,7 +2,6 @@
 
 import { useState, useCallback, useRef } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 
 /* ── Types ── */
 interface ExtractedData {
@@ -53,11 +52,12 @@ export default function AdminPage() {
 
   const photoInputRef = useRef<HTMLInputElement>(null);
   const ocrInputRef = useRef<HTMLInputElement>(null);
-  const router = useRouter();
 
   const handleLogout = async () => {
     await fetch("/api/admin-auth", { method: "DELETE" });
-    router.push("/admin/login");
+    // Hard navigation so the cleared cookie takes effect server-side and no
+    // stale authenticated /admin page lingers in the client router cache.
+    window.location.assign("/admin/login");
   };
 
   /* ── Field change ── */

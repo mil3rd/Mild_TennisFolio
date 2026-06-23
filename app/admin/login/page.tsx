@@ -1,13 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 
 export default function AdminLoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -22,16 +20,21 @@ export default function AdminLoginPage() {
       });
 
       if (res.ok) {
-        router.push("/admin");
-        router.refresh();
-      } else {
-        const json = await res.json();
-        setError(json.error ?? "Incorrect password.");
-        setPassword("");
+        // Full-document navigation (NOT router.push) on purpose: the App Router
+        // caches the earlier unauthenticated /admin → /admin/login redirect, so a
+        // soft navigation would replay that stale redirect and bounce us right
+        // back to this page. A hard navigation sends the freshly-set auth cookie
+        // to the server and bypasses the client router cache entirely.
+        window.location.assign("/admin");
+        return; // keep the button in its loading state while the page unloads
       }
+
+      const json = await res.json();
+      setError(json.error ?? "Incorrect password.");
+      setPassword("");
+      setLoading(false);
     } catch {
       setError("Network error — please try again.");
-    } finally {
       setLoading(false);
     }
   }
