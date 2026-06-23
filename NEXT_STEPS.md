@@ -19,7 +19,7 @@ Stack: **Next.js 16.2.7** (App Router, Turbopack, React 19.2), Drizzle ORM + Neo
   on success (bypasses the client router cache, sends the fresh cookie to the server).
 - Logout in `app/admin/page.tsx` also switched to `window.location.assign("/admin/login")`.
 
-### 2. Admin can now EDIT / DELETE achievements — built, NOT yet fully verified
+### 2. Admin can now EDIT / DELETE achievements — built AND verified ✅
 New/changed files:
 - `lib/auth.ts` **(new)** — `COOKIE`, `SALT`, `hashPassword()`, `isAdminRequest()` (reads the
   `admin_token` cookie, constant-time compares to expected hash).
@@ -34,52 +34,38 @@ New/changed files:
   (`window.confirm` → `DELETE`). Edit mode keeps existing image URLs, lets you remove them,
   and append newly uploaded ones (`images = [...existingImages, ...uploadedUrls]`).
 
-Verified: `npx tsc --noEmit` passes (exit 0). Login flow verified server-side via curl.
+Verified: `npx tsc --noEmit` passes, `npx eslint .` passes (0 problems), and the full
+edit/delete lifecycle was exercised against the running dev server via curl (see below).
+
+---
+
+## ✅ A & B — DONE (2026-06-23)
+
+### A. ESLint error — FIXED
+`app/admin/page.tsx` no longer calls a setState-bearing callback in `useEffect`. The initial
+load now uses an inline `async` IIFE with a visible `await` before `setList` (plus an `active`
+cleanup flag). `npx eslint .` → **0 problems**, `npx tsc --noEmit` → **exit 0**.
+
+### B. Endpoints — VERIFIED via curl (non-destructive; created + deleted a throwaway row)
+Results, all as expected:
+- 401 (no cookie) for: `POST /api/achievements`, `PATCH /api/achievements/:id`,
+  `DELETE /api/achievements/:id`, `POST /api/upload`, `POST /api/ocr`.
+- `POST` (with cookie) created a row; `PATCH` (with cookie) updated every field → 200.
+- `PATCH` non-numeric id → 400; `PATCH` bad age_group → 400; `DELETE` missing id → 404.
+- `DELETE` (with cookie) removed the test row; list count returned to its original value.
+- `GET /admin` (with cookie) renders 200 and shows the new "Manage Achievements" section.
+
+Still worth doing when you're back: a quick **manual browser pass** (log in → edit an item:
+change title + remove a saved photo + add a new one → save → delete an item → confirm the
+homepage reflects the changes). Note: the DB was empty (0 rows) during testing.
+
+> Transient note: one `GET /api/achievements` logged `NeonDbError: fetch failed` (intermittent
+> network blip to Neon). All other DB calls succeeded; the page degrades to an empty list. Not a
+> code bug — but if it recurs often in production, consider a retry around the Neon HTTP driver.
 
 ---
 
 ## 🔧 TODO — pick up here
-
-### A. Fix the one remaining ESLint error (BLOCKER for clean lint)
-`app/admin/page.tsx:96` — rule `react-hooks/set-state-in-effect`:
-```js
-useEffect(() => {
-  refreshList();          // <-- flagged: setState inside effect
-}, [refreshList]);
-```
-The state update actually happens **after** `await fetch(...)` (not synchronous), so this is a
-conservative false-positive. Fix one of these ways:
-- Simplest: add `// eslint-disable-next-line react-hooks/set-state-in-effect` above the call
-  with a short justification comment, **or**
-- Cleaner: move the fetch+`setList` into an inner `async` function declared inside the effect
-  and call it (and consider an `AbortController` for cleanup).
-
-Then confirm: `npx eslint app/admin/page.tsx` → 0 problems.
-
-### B. Verify the new endpoints (was in progress, not finished)
-Start dev server (avoid port clashes; `.env.local` is the source of truth, ADMIN_PASSWORD=`mild67`):
-```bash
-PORT=3939 npm run dev        # (background)
-```
-Then:
-```bash
-cd <scratchpad>
-# 1. login → get cookie
-curl -s -c cookies.txt -X POST localhost:3939/api/admin-auth \
-  -H 'Content-Type: application/json' -d '{"password":"mild67"}'
-# 2. list
-curl -s -b cookies.txt localhost:3939/api/achievements | head
-# 3. DELETE without cookie → expect 401
-curl -s -o /dev/null -w '%{http_code}\n' -X DELETE localhost:3939/api/achievements/1
-# 4. DELETE with cookie → expect 200/404 (404 if id absent)
-curl -s -b cookies.txt -X DELETE localhost:3939/api/achievements/999999
-# 5. PATCH with cookie (use a real id from step 2)
-curl -s -b cookies.txt -X PATCH localhost:3939/api/achievements/<ID> \
-  -H 'Content-Type: application/json' \
-  -d '{"title":"Edited","age_group":"12-14","event_date":"2024-01-01","award":"1st Place","images":[]}'
-```
-Also do a quick **browser** pass: log in, edit an item (change title + remove a photo + add one),
-save, delete an item — confirm the homepage reflects changes.
 
 ### C. Second known issue (DEFERRED by user) — Vercel production upload broken
 - **Root cause:** `app/api/upload/route.ts` writes files to `public/uploads/` via `fs.writeFile`.

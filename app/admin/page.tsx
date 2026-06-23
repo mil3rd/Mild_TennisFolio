@@ -93,8 +93,23 @@ export default function AdminPage() {
   }, []);
 
   useEffect(() => {
-    refreshList();
-  }, [refreshList]);
+    // Initial load. setList runs only after the awaited fetch resolves (not
+    // synchronously during the effect), so it can't cause cascading renders.
+    let active = true;
+    (async () => {
+      try {
+        const res = await fetch("/api/achievements");
+        if (!res.ok || !active) return;
+        const data = (await res.json()) as Achievement[];
+        if (active) setList(data);
+      } catch {
+        /* non-fatal — the list just stays empty */
+      }
+    })();
+    return () => {
+      active = false;
+    };
+  }, []);
 
   /* ── Field change ── */
   const handleChange = (
