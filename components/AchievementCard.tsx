@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import type { Achievement } from "@/lib/db";
+import ZoomableImage from "./ZoomableImage";
 
 type Variant = "polaroid" | "card";
 
@@ -129,8 +130,7 @@ export default function AchievementCard({
       <div className="bg-white rounded-lg border border-parchment shadow-sm hover:shadow-md transition-shadow overflow-hidden group">
         <div className="aspect-video bg-mint-light overflow-hidden relative">
           {mainImage ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+            <ZoomableImage
               src={mainImage}
               alt={title}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"

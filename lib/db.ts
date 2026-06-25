@@ -24,6 +24,18 @@ export const achievements = pgTable("achievements", {
 export type Achievement = typeof achievements.$inferSelect;
 export type NewAchievement = typeof achievements.$inferInsert;
 
+// Uploaded images are stored in the database (base64 in a text column) rather
+// than on disk, so they survive on read-only/ephemeral serverless filesystems.
+export const images = pgTable("images", {
+  id: text("id").primaryKey(),
+  content_type: varchar("content_type", { length: 100 }).notNull(),
+  data: text("data").notNull(), // base64-encoded bytes
+  created_at: timestamp("created_at", { mode: "string" }).defaultNow(),
+});
+
+export type ImageRow = typeof images.$inferSelect;
+export type NewImage = typeof images.$inferInsert;
+
 let _db: ReturnType<typeof drizzle> | null = null;
 
 export function getDb() {
