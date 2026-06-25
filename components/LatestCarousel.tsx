@@ -41,10 +41,13 @@ export default function LatestCarousel({
         </div>
 
         {/* Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 items-start">
+        <div className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory md:grid md:grid-cols-2 md:overflow-visible md:pb-0 lg:grid-cols-3">
           {slice.map((a, i) => (
-            <div key={a.id} className="flex justify-center">
-              <div className="w-64">
+            <div
+              key={a.id}
+              className="flex min-w-[260px] max-w-[260px] shrink-0 justify-center snap-start sm:min-w-[280px] sm:max-w-[280px] md:min-w-0 md:max-w-none md:w-auto"
+            >
+              <div className="w-full md:w-64">
                 <AchievementCard
                   achievement={a}
                   variant="polaroid"

@@ -60,9 +60,14 @@ export default function AgeGroupSection({ ageGroup, achievements }: Props) {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+          <div className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory md:grid md:grid-cols-2 md:overflow-visible md:pb-0 lg:grid-cols-3 xl:grid-cols-4">
             {achievements.map((a) => (
-              <AchievementCard key={a.id} achievement={a} variant="card" />
+              <div
+                key={a.id}
+                className="min-w-[260px] max-w-[260px] shrink-0 snap-start sm:min-w-[280px] sm:max-w-[280px] md:min-w-0 md:max-w-none md:w-auto"
+              >
+                <AchievementCard achievement={a} variant="card" />
+              </div>
             ))}
           </div>
         )}
