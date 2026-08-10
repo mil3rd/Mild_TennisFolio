@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 
 interface Props {
   src: string;
@@ -42,31 +43,40 @@ export default function ZoomableImage({ src, alt, className }: Props) {
         style={{ cursor: "zoom-in" }}
       />
 
-      {open && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          onClick={() => setOpen(false)}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-[fadeIn_0.15s_ease-out]"
-        >
-          <button
-            type="button"
+      {/*
+        Rendered via a portal to document.body so the fixed overlay is
+        positioned relative to the viewport. Without this, a transformed
+        ancestor (e.g. the tilted polaroid cards use `transform: rotate`)
+        becomes the containing block and the lightbox drifts off-center.
+      */}
+      {open &&
+        typeof document !== "undefined" &&
+        createPortal(
+          <div
+            role="dialog"
+            aria-modal="true"
             onClick={() => setOpen(false)}
-            aria-label="Close image"
-            className="absolute top-4 right-4 w-11 h-11 flex items-center justify-center rounded-full bg-white/90 text-brown text-3xl leading-none hover:bg-white transition-colors shadow-lg"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-[fadeIn_0.15s_ease-out]"
           >
-            ×
-          </button>
+            <button
+              type="button"
+              onClick={() => setOpen(false)}
+              aria-label="Close image"
+              className="absolute top-4 right-4 w-11 h-11 flex items-center justify-center rounded-full bg-white/90 text-brown text-3xl leading-none hover:bg-white transition-colors shadow-lg"
+            >
+              ×
+            </button>
 
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={src}
-            alt={alt}
-            onClick={(e) => e.stopPropagation()}
-            className="max-w-[92vw] max-h-[90vh] object-contain rounded-lg shadow-2xl cursor-default"
-          />
-        </div>
-      )}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={src}
+              alt={alt}
+              onClick={(e) => e.stopPropagation()}
+              className="max-w-[92vw] max-h-[90vh] object-contain rounded-lg shadow-2xl cursor-default"
+            />
+          </div>,
+          document.body
+        )}
 
       <style>{`
         @keyframes fadeIn {

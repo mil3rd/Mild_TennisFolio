@@ -103,7 +103,7 @@ app/
 
 components/
 ├── Navbar.tsx
-├── HeroSection.tsx       Notebook-paper hero with stats
+├── HeroSection.tsx       Notebook-paper hero
 ├── LatestCarousel.tsx    Paginated polaroid carousel (client)
 ├── AgeGroupSection.tsx   Per age-group card grid
 ├── AchievementCard.tsx   Polaroid + standard card variants

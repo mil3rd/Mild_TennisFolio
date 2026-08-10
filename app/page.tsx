@@ -19,7 +19,7 @@ async function fetchAchievements(): Promise<FetchResult> {
     const data = await db
       .select()
       .from(achievements)
-      .orderBy(desc(achievements.created_at));
+      .orderBy(desc(achievements.event_date), desc(achievements.created_at));
     return { data, setupNeeded: false };
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
@@ -33,24 +33,6 @@ async function fetchAchievements(): Promise<FetchResult> {
   }
 }
 
-function computeStats(all: Achievement[]) {
-  const tournaments = all.length;
-  const wins = all.filter((a) =>
-    /1st|first|gold|champion|winner/i.test(a.award)
-  ).length;
-
-  const earliest = all.reduce<string | null>((acc, a) => {
-    if (!acc || a.event_date < acc) return a.event_date;
-    return acc;
-  }, null);
-
-  const years = earliest
-    ? new Date().getFullYear() - new Date(earliest).getFullYear()
-    : 0;
-
-  return { years: Math.max(years, 0), tournaments, wins };
-}
-
 export default async function HomePage() {
   const { data: all, setupNeeded } = await fetchAchievements();
 
@@ -58,7 +40,6 @@ export default async function HomePage() {
   const group8 = all.filter((a) => a.age_group === "8-10");
   const group12 = all.filter((a) => a.age_group === "12-14");
   const group16 = all.filter((a) => a.age_group === "16-18");
-  const stats = computeStats(all);
 
   return (
     <>
@@ -79,7 +60,7 @@ export default async function HomePage() {
         )}
 
         {/* Hero */}
-        <HeroSection stats={stats} />
+        <HeroSection />
 
         {/* Latest Results Carousel */}
         <LatestCarousel achievements={latest} />

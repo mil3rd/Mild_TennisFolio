@@ -1,10 +1,4 @@
-interface Stats {
-  years: number;
-  tournaments: number;
-  wins: number;
-}
-
-export default function HeroSection({ stats }: { stats: Stats }) {
+export default function HeroSection() {
   return (
     <section className="relative notebook-bg torn-bottom">
       <div className="max-w-6xl mx-auto px-6 py-24 md:py-32 text-center">
@@ -42,7 +36,7 @@ export default function HeroSection({ stats }: { stats: Stats }) {
         </div>
 
         {/* CTA buttons */}
-        <div className="fade-up fade-up-3 flex flex-wrap items-center justify-center gap-4 mb-16">
+        <div className="fade-up fade-up-3 flex flex-wrap items-center justify-center gap-4">
           <a
             href="#latest"
             className="font-lato font-semibold bg-sage text-cream px-7 py-3 rounded-full hover:bg-sage-dark transition-colors shadow-md tracking-wide text-sm"
@@ -56,27 +50,7 @@ export default function HeroSection({ stats }: { stats: Stats }) {
             Browse Archive
           </a>
         </div>
-
-        {/* Stats strip */}
-        <div className="fade-up fade-up-4 inline-flex items-stretch divide-x divide-parchment bg-white/70 backdrop-blur-sm rounded-2xl shadow-sm border border-parchment px-2">
-          <StatItem value={stats.years} label="years playing" />
-          <StatItem value={stats.tournaments} label="tournaments" />
-          <StatItem value={stats.wins} label="wins & titles" />
-        </div>
       </div>
     </section>
-  );
-}
-
-function StatItem({ value, label }: { value: number; label: string }) {
-  return (
-    <div className="px-8 py-5 text-center">
-      <p className="font-playfair text-3xl font-bold text-sage leading-none">
-        {value}
-      </p>
-      <p className="font-dancing text-sm text-brown/70 mt-1 capitalize">
-        {label}
-      </p>
-    </div>
   );
 }
