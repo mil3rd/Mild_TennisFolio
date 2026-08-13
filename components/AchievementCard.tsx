@@ -17,6 +17,7 @@ function badgeClass(award: string) {
   const a = award.toLowerCase();
   if (/1st|first|gold|champion|winner/.test(a)) return "badge-gold";
   if (/2nd|second|silver|runner/.test(a)) return "badge-silver";
+  if (/อื่นๆ|other/.test(a)) return "badge-other";
   return "badge-sage";
 }
 

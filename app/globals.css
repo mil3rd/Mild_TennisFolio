@@ -140,6 +140,12 @@ body {
     border: 1.5px dashed #4a7c4a;
   }
 
+  .badge-other {
+    background: #fce7f3;
+    color: #831843;
+    border: 1px solid #fbcfe8;
+  }
+
   /* Fade-up animation helper */
   .fade-up {
     opacity: 0;

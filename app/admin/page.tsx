@@ -38,6 +38,7 @@ function badgeClass(award: string) {
   const a = award.toLowerCase();
   if (/1st|first|gold|champion|winner/.test(a)) return "badge-gold";
   if (/2nd|second|silver|runner/.test(a)) return "badge-silver";
+  if (/อื่นๆ|other/.test(a)) return "badge-other";
   return "badge-sage";
 }
 
@@ -47,6 +48,7 @@ function normalizeAward(raw: string): string {
   if (/1st|first|gold|champion|winner/.test(a)) return "First Place";
   if (/2nd|second|silver|runner/.test(a)) return "Second Place";
   if (/3rd|third|bronze/.test(a)) return "Third Place";
+  if (/อื่นๆ|other/.test(a)) return "อื่นๆ";
   return "";
 }
 
@@ -502,6 +504,7 @@ export default function AdminPage() {
                   <option value="First Place">First Place</option>
                   <option value="Second Place">Second Place</option>
                   <option value="Third Place">Third Place</option>
+                  <option value="อื่นๆ">อื่นๆ</option>
                 </select>
                 {form.award && (
                   <span
@@ -511,7 +514,9 @@ export default function AdminPage() {
                       ? "🥇"
                       : badgeClass(form.award) === "badge-silver"
                         ? "🥈"
-                        : "🥉"}
+                        : badgeClass(form.award) === "badge-other"
+                          ? "🏅"
+                          : "🥉"}
                   </span>
                 )}
               </div>
