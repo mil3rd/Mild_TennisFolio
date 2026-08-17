@@ -7,52 +7,49 @@ interface Props {
   photos?: HeroPhoto[];
 }
 
-/** Fixed scrapbook look per frame, so the layout never shifts between visits. */
-const FRAME_STYLE: Record<
-  HeroSlot,
-  { tilt: "l" | "r" | "n"; tape: string; nudge: string }
-> = {
-  1: { tilt: "l", tape: "", nudge: "md:mr-2" },
-  2: { tilt: "r", tape: "tape-pink", nudge: "md:ml-4" },
-  3: { tilt: "r", tape: "tape-green", nudge: "md:ml-2" },
-  4: { tilt: "l", tape: "", nudge: "md:mr-4" },
+/** Fixed scrapbook look per frame, so the layout never shifts between visits.
+    Angle and offset live in `.hero-frame-{slot}` (globals.css), which can tune
+    them per breakpoint; only size and tape colour vary from here. */
+const FRAME_STYLE: Record<HeroSlot, { tape: string; size: string }> = {
+  1: { tape: "", size: "w-32 md:w-36 xl:w-40" },
+  2: { tape: "tape-pink", size: "w-32 lg:-ml-8" },
+  3: { tape: "tape-green", size: "w-32 md:w-36" },
+  4: { tape: "", size: "w-32 xl:w-36" },
 };
 
 function PhotoFrame({ slot, photo }: { slot: HeroSlot; photo?: HeroPhoto }) {
-  const { tilt, tape, nudge } = FRAME_STYLE[slot];
+  const { tape, size } = FRAME_STYLE[slot];
   const caption = photo?.caption?.trim() ?? "";
 
   return (
-    <div className={nudge}>
-      <figure
-        className={`polaroid polaroid-tilt-${tilt} w-32 sm:w-36 lg:w-40 shrink-0`}
-      >
-        <div className={`tape ${tape}`} />
+    <figure
+      className={`polaroid hero-frame hero-frame-${slot} ${size} shrink-0`}
+    >
+      <div className={`tape ${tape}`} />
 
-        <div className="w-full aspect-[4/5] bg-mint-light overflow-hidden">
-          {photo ? (
-            <ZoomableImage
-              src={photo.url}
-              alt={caption || `Phassaree — photo ${slot}`}
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <div className="dashed-frame w-full h-full flex flex-col items-center justify-center gap-1 bg-cream/70 select-none">
-              <span className="text-2xl opacity-40">🎾</span>
-              <span className="font-dancing text-sm text-sage/60">
-                photo {slot}
-              </span>
-            </div>
-          )}
-        </div>
-
-        {caption && (
-          <figcaption className="mt-2 px-0.5 text-center font-dancing text-base leading-tight text-sage-dark line-clamp-2">
-            {caption}
-          </figcaption>
+      <div className="w-full aspect-[4/5] bg-mint-light overflow-hidden">
+        {photo ? (
+          <ZoomableImage
+            src={photo.url}
+            alt={caption || `Phassaree — photo ${slot}`}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className="dashed-frame w-full h-full flex flex-col items-center justify-center gap-1 bg-cream/70 select-none">
+            <span className="text-2xl opacity-40">🎾</span>
+            <span className="font-dancing text-sm text-sage/60">
+              photo {slot}
+            </span>
+          </div>
         )}
-      </figure>
-    </div>
+      </div>
+
+      {caption && (
+        <figcaption className="mt-2 px-0.5 text-center font-dancing text-base leading-tight text-sage-dark line-clamp-2">
+          {caption}
+        </figcaption>
+      )}
+    </figure>
   );
 }
 
@@ -81,8 +78,9 @@ export default function HeroSection({ photos = [] }: Props) {
         </div>
 
         {/* Photo frames flank the heading on desktop and sit below it on mobile */}
-        <div className="flex flex-col items-center gap-10 md:flex-row md:justify-center md:gap-6 lg:gap-12">
-          <div className="fade-up fade-up-4 order-2 flex justify-center gap-5 md:order-1 md:flex-col md:gap-10">
+        <div className="flex flex-col items-center gap-10 md:flex-row md:justify-center md:gap-6 xl:gap-12">
+          {/* Left pair: stacked on tablet, side by side and overlapping on desktop */}
+          <div className="fade-up fade-up-4 order-2 flex justify-center gap-4 md:order-1 md:flex-col md:items-center md:gap-9 lg:flex-row lg:items-start lg:gap-2">
             {left.map(frame)}
           </div>
 
@@ -124,7 +122,8 @@ export default function HeroSection({ photos = [] }: Props) {
             </div>
           </div>
 
-          <div className="fade-up fade-up-5 order-3 flex justify-center gap-5 md:flex-col md:gap-10">
+          {/* Right pair: runs down and to the right */}
+          <div className="fade-up fade-up-5 order-3 flex justify-center gap-4 md:flex-col md:items-center md:gap-9">
             {right.map(frame)}
           </div>
         </div>

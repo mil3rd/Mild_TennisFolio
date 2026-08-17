@@ -83,12 +83,59 @@ body {
     box-shadow: 4px 10px 24px rgba(0, 0, 0, 0.18);
   }
 
+  /* Hero scrapbook frames — each one pinned at its own angle and offset.
+     Offsets are transforms, so the flex layout underneath never shifts. */
+  .hero-frame {
+    --tilt: 0deg;
+    --shift-x: 0rem;
+    --shift-y: 0rem;
+    transform: translate(var(--shift-x), var(--shift-y)) rotate(var(--tilt));
+    transition: transform 0.28s ease, box-shadow 0.28s ease;
+    z-index: 1;
+  }
+  .hero-frame:hover {
+    transform: translate(var(--shift-x), var(--shift-y)) rotate(0deg) scale(1.05);
+    box-shadow: 4px 12px 26px rgba(0, 0, 0, 0.18);
+    z-index: 20;
+  }
+
+  /* The two frames that lie on top where a pair overlaps */
+  .hero-frame-2 { z-index: 2; }
+  .hero-frame-4 { z-index: 2; }
+
+  /* Phone: tidy 2×2 grid, just enough tilt to look hand-placed */
+  .hero-frame-1 { --tilt: -4.5deg; --tape-x: -10px; }
+  .hero-frame-2 { --tilt:  3.5deg; --shift-y: 0.7rem; }
+  .hero-frame-3 { --tilt:  4deg; }
+  .hero-frame-4 { --tilt: -3.5deg; --shift-y: 0.7rem; --tape-x: 12px; }
+
+  /* Tablet: pairs stack beside the heading, staggered off each other.
+     Sideways shifts lean inward — the section's torn clip-path crops
+     anything that reaches past the page padding. */
+  @media (min-width: 768px) {
+    .hero-frame-1 { --tilt: -8deg;   --shift-x: -0.25rem; --shift-y: -1.25rem; }
+    .hero-frame-2 { --tilt: -4deg;   --shift-x:  1.25rem; --shift-y: -0.25rem; }
+    .hero-frame-3 { --tilt:  6deg;   --shift-x: -1rem;    --shift-y:  0.75rem; }
+    .hero-frame-4 { --tilt: -6.5deg; --shift-x:  0.5rem;  --shift-y:  1.75rem; }
+  }
+
+  /* Desktop: left pair lies side by side and overlaps, right pair runs
+     down and to the right — the arrangement from the sketch. */
+  @media (min-width: 1024px) {
+    .hero-frame-1 { --tilt: -10deg;  --shift-x:  0.25rem; --shift-y: -2.25rem; }
+    /* the pair's overlap is a negative margin on the figure, so it also
+       gives the heading its width back */
+    .hero-frame-2 { --tilt: -4.5deg; --shift-x:  0rem;    --shift-y:  1.5rem; }
+    .hero-frame-3 { --tilt:  6deg;   --shift-x: -1.5rem;  --shift-y:  0.5rem; }
+    .hero-frame-4 { --tilt: -7deg;   --shift-x:  0.25rem; --shift-y:  2.5rem; }
+  }
+
   /* Washi tape strip */
   .tape {
     position: absolute;
     top: -11px;
     left: 50%;
-    transform: translateX(-50%) rotate(-3deg);
+    transform: translateX(calc(-50% + var(--tape-x, 0px))) rotate(-3deg);
     width: 64px;
     height: 22px;
     background: rgba(247, 233, 142, 0.82);
@@ -100,13 +147,13 @@ body {
   .tape-pink {
     background: rgba(249, 190, 215, 0.82);
     border-color: rgba(210, 140, 170, 0.35);
-    transform: translateX(-50%) rotate(2deg);
+    transform: translateX(calc(-50% + var(--tape-x, 0px))) rotate(2deg);
   }
 
   .tape-green {
     background: rgba(168, 213, 186, 0.82);
     border-color: rgba(100, 170, 130, 0.35);
-    transform: translateX(-50%) rotate(-1.5deg);
+    transform: translateX(calc(-50% + var(--tape-x, 0px))) rotate(-1.5deg);
   }
 
   /* Award badge */
@@ -167,19 +214,37 @@ body {
     background-position: 0 6px, 44px 0;
   }
 
-  /* Torn paper bottom edge (clip-path zigzag) */
+  /* Torn paper bottom edge (clip-path zigzag).
+     Tooth depth is a fixed height, never a % of the section: a tall section
+     (the stacked mobile hero) turned % teeth into huge spikes across the page. */
   .torn-bottom {
+    --tear: 20px;
     clip-path: polygon(
-      0 0, 100% 0, 100% 88%,
-      98% 100%, 95% 82%, 92% 100%, 89% 78%, 86% 98%,
-      83% 80%, 80% 100%, 77% 84%, 74% 100%, 71% 76%,
-      68% 96%, 65% 82%, 62% 100%, 59% 78%, 56% 96%,
-      53% 80%, 50% 100%, 47% 82%, 44% 98%, 41% 76%,
-      38% 100%, 35% 84%, 32% 96%, 29% 78%, 26% 100%,
-      23% 82%, 20% 96%, 17% 80%, 14% 100%, 11% 76%,
-      8% 96%, 5% 82%, 2% 100%, 0 84%
+      0 0, 100% 0,
+      100% calc(100% - var(--tear) * 0.55),
+      98% 100%, 95% calc(100% - var(--tear) * 0.8),
+      92% 100%, 89% calc(100% - var(--tear)),
+      86% calc(100% - var(--tear) * 0.2), 83% calc(100% - var(--tear) * 0.85),
+      80% 100%, 77% calc(100% - var(--tear) * 0.65),
+      74% 100%, 71% calc(100% - var(--tear)),
+      68% calc(100% - var(--tear) * 0.2), 65% calc(100% - var(--tear) * 0.75),
+      62% 100%, 59% calc(100% - var(--tear) * 0.9),
+      56% calc(100% - var(--tear) * 0.2), 53% calc(100% - var(--tear) * 0.8),
+      50% 100%, 47% calc(100% - var(--tear) * 0.75),
+      44% calc(100% - var(--tear) * 0.1), 41% calc(100% - var(--tear)),
+      38% 100%, 35% calc(100% - var(--tear) * 0.65),
+      32% calc(100% - var(--tear) * 0.2), 29% calc(100% - var(--tear) * 0.9),
+      26% 100%, 23% calc(100% - var(--tear) * 0.75),
+      20% calc(100% - var(--tear) * 0.2), 17% calc(100% - var(--tear) * 0.85),
+      14% 100%, 11% calc(100% - var(--tear)),
+      8% calc(100% - var(--tear) * 0.2), 5% calc(100% - var(--tear) * 0.75),
+      2% 100%, 0 calc(100% - var(--tear) * 0.65)
     );
-    padding-bottom: 2rem;
+    padding-bottom: calc(var(--tear) + 1rem);
+  }
+
+  @media (min-width: 768px) {
+    .torn-bottom { --tear: 30px; }
   }
 
   /* Dashed decorative border */
