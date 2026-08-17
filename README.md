@@ -65,6 +65,21 @@ Go to [http://localhost:3000/admin](http://localhost:3000/admin):
 
 ---
 
+## Hero Photo Frames
+
+The homepage hero has four scrapbook frames — two on each side of the title.
+They're filled from **Admin → Hero Photo Frames** at the top of the dashboard:
+
+- **Upload photo / Change photo** — pick an image for that frame
+- **Caption** — optional handwritten line under the picture (max 120 chars)
+- **Remove** — empties the frame; it falls back to a dashed placeholder
+
+Pictures are stored in the database, so the homepage reflects a change on the
+very next load — no code edit or redeploy needed. Replacing or removing a photo
+also deletes the old image bytes, so the database doesn't collect leftovers.
+
+---
+
 ## Scripts
 
 | Script | Description |
@@ -97,18 +112,25 @@ app/
 ├── page.tsx              Homepage (server component)
 ├── admin/page.tsx        Admin dashboard (client component)
 └── api/
-    ├── achievements/     GET all / POST new
-    ├── upload/           POST image → /public/uploads/
+    ├── achievements/     GET all / POST new / PATCH + DELETE by id
+    ├── hero-photos/      GET all / PUT one frame / DELETE by slot
+    ├── images/[id]/      GET stored image bytes
+    ├── upload/           POST image → images table
     └── ocr/              POST image → Tesseract OCR
 
 components/
 ├── Navbar.tsx
-├── HeroSection.tsx       Notebook-paper hero
+├── HeroSection.tsx       Notebook-paper hero + the four photo frames
+├── HeroPhotoManager.tsx  Admin panel for those frames (client)
 ├── LatestCarousel.tsx    Paginated polaroid carousel (client)
 ├── AgeGroupSection.tsx   Per age-group card grid
 ├── AchievementCard.tsx   Polaroid + standard card variants
+├── ZoomableImage.tsx     Click-to-enlarge lightbox (client)
 └── Footer.tsx
 
 lib/
-└── db.ts                 Neon driver, Drizzle schema, getDb()
+├── db.ts                 Neon driver, Drizzle schema, getDb()
+├── auth.ts               Admin cookie/session check
+├── hero-frames.ts        Frame slots + validation shared by client & server
+└── hero-images.ts        Removes image bytes a frame no longer uses
 ```

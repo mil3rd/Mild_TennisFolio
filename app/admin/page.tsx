@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useRef, useEffect } from "react";
 import Link from "next/link";
+import HeroPhotoManager from "@/components/HeroPhotoManager";
 import type { Achievement } from "@/lib/db";
 
 /* ── Types ── */
@@ -362,6 +363,9 @@ export default function AdminPage() {
             {statusMsg}
           </div>
         )}
+
+        {/* Homepage hero frames */}
+        <HeroPhotoManager />
 
         {/* OCR Section */}
         <section className="mb-10 p-6 bg-white rounded-xl border border-parchment shadow-sm">

@@ -38,6 +38,16 @@ try {
     )
   `;
   console.log("✅  Table 'images' is ready.");
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS hero_photos (
+      slot       INTEGER PRIMARY KEY,
+      url        TEXT NOT NULL,
+      caption    VARCHAR(120),
+      updated_at TIMESTAMP DEFAULT NOW()
+    )
+  `;
+  console.log("✅  Table 'hero_photos' is ready.");
 } catch (err) {
   console.error("❌  Failed:", err instanceof Error ? err.message : err);
   process.exit(1);

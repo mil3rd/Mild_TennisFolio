@@ -1,12 +1,18 @@
 export const dynamic = "force-dynamic";
 
-import { desc } from "drizzle-orm";
+import { asc, desc } from "drizzle-orm";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import LatestCarousel from "@/components/LatestCarousel";
 import AgeGroupSection from "@/components/AgeGroupSection";
 import Footer from "@/components/Footer";
-import { getDb, achievements, type Achievement } from "@/lib/db";
+import {
+  getDb,
+  achievements,
+  heroPhotos,
+  type Achievement,
+  type HeroPhoto,
+} from "@/lib/db";
 
 type FetchResult = { data: Achievement[]; setupNeeded: boolean };
 
@@ -33,8 +39,23 @@ async function fetchAchievements(): Promise<FetchResult> {
   }
 }
 
+/** Hero frame pictures. Empty frames are fine, so failures stay silent here. */
+async function fetchHeroPhotos(): Promise<HeroPhoto[]> {
+  if (!process.env.DATABASE_URL) return [];
+  try {
+    const db = getDb();
+    return await db.select().from(heroPhotos).orderBy(asc(heroPhotos.slot));
+  } catch {
+    // Table not created yet — the hero just renders four empty frames.
+    return [];
+  }
+}
+
 export default async function HomePage() {
-  const { data: all, setupNeeded } = await fetchAchievements();
+  const [{ data: all, setupNeeded }, photos] = await Promise.all([
+    fetchAchievements(),
+    fetchHeroPhotos(),
+  ]);
 
   const latest = all.slice(0, 6);
   const group8 = all.filter((a) => a.age_group === "8-10");
@@ -60,7 +81,7 @@ export default async function HomePage() {
         )}
 
         {/* Hero */}
-        <HeroSection />
+        <HeroSection photos={photos} />
 
         {/* Latest Results Carousel */}
         <LatestCarousel achievements={latest} />

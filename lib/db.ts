@@ -5,6 +5,7 @@ import {
   serial,
   varchar,
   date,
+  integer,
   text,
   timestamp,
 } from "drizzle-orm/pg-core";
@@ -35,6 +36,19 @@ export const images = pgTable("images", {
 
 export type ImageRow = typeof images.$inferSelect;
 export type NewImage = typeof images.$inferInsert;
+
+// The four portrait frames in the homepage hero. One row per frame slot (1–4),
+// so a picture can be swapped from the admin dashboard without touching code.
+// A missing row simply means that frame is still empty.
+export const heroPhotos = pgTable("hero_photos", {
+  slot: integer("slot").primaryKey(),
+  url: text("url").notNull(),
+  caption: varchar("caption", { length: 120 }),
+  updated_at: timestamp("updated_at", { mode: "string" }).defaultNow(),
+});
+
+export type HeroPhoto = typeof heroPhotos.$inferSelect;
+export type NewHeroPhoto = typeof heroPhotos.$inferInsert;
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
